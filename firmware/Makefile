@@ -48,7 +48,7 @@ AVRDUDE := avrdude
 FWFLAGS := -mmcu=${MCU} -DF_CPU=${F_CPU}
 
 ## Compiler options.
-## ***NORE: 2022-17-6	gcc 12.1.0
+## ***NOTE: 2022-17-6	gcc 12.1.0
 ## ***NOTE: array-bounds=0 is needed to prevent warnings about accessing bits in a byte?
 CFLAGS := -g -Os -Wall -Warray-bounds=0 $(addprefix -I,$(INC_DIR))
 
