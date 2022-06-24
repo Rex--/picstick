@@ -103,7 +103,10 @@ unsigned char cmd_word(void)
 
     // Begin write command
     icsp_command(ICSP_CMD_START_INT);
-    _delay_us(ICSP_DELAY_PINT_CW);
+
+    // Wait at least half of the time required for internal timed programming.
+    // The time it takes to respond and such should cover the other half
+    _delay_us(ICSP_DELAY_PINT_CW/2);
 
     // verify data
 
@@ -116,8 +119,8 @@ unsigned char cmd_word(void)
 unsigned char cmd_row(void)
 {
     // Get address
-    recv_size = uuart_rx_bytes_until(SERIAL_CMD_SEP, input_buffer, INPUT_BUFFER_SIZE);
-    if (recv_size != 2) {
+    recv_size = uuart_rx_bytes(input_buffer, 3);
+    if ((recv_size != 3) || (input_buffer[2] != ':')) {
         cmd_resp_error(input_buffer, recv_size);
         return STATUS_PROGRAM;
     }
@@ -155,10 +158,11 @@ unsigned char cmd_row(void)
     icsp_payload(word);
     _delay_us(ICSP_DELAY_DLY);
 
-
     // Begin write command
     icsp_command(ICSP_CMD_START_INT);
-    _delay_us(ICSP_DELAY_PINT_PM);
+    
+    // Hope our serial transfer takes longer than 4ms. (Usually does)
+    // _delay_us(ICSP_DELAY_PINT_PM);
 
     // verify data
 
