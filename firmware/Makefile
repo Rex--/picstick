@@ -15,10 +15,10 @@ INC_DIR = .
 MCU = attiny44
 
 ## Frequency of clock in Hz.
-F_CPU = 8000000UL
+F_CPU = 12000000
 
 ## Fuse settings.
-LFUSE = 0xE2
+LFUSE = 0xFF
 HFUSE = 0xDF
 EFUSE = 0xFF
 

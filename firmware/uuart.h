@@ -3,10 +3,10 @@
 /** USI UART Config **/
 
 #define SYSTEM_CLOCK		F_CPU
-#define TIMER_PRESCALER		8
-#define PRESCALECMD			(1<<CS01)
+#define TIMER_PRESCALER		1
+#define PRESCALECMD			(1<<CS00)
 
-#define BAUDRATE		9600
+#define BAUDRATE			115200
 
 // Buffer size must be a power of 2
 #define UART_RX_BUFFER_SIZE     4
