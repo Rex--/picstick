@@ -129,7 +129,7 @@ icsp_payload (unsigned int data)
 unsigned int
 icsp_read (void)
 {
-    int i;
+    signed char i;
     unsigned int word = 0;
 
     // Configure our DAT pin as input
@@ -146,7 +146,7 @@ icsp_read (void)
     }
 
     // Clock out 14 cycles and read the data bits on a CLK fall
-    for (i=13; i>=0; i--)
+    for (i = 13; i > -1; i--)
     {
         pin_high(ICSP_PIN_CLK);     // CLK High
 
@@ -155,7 +155,10 @@ icsp_read (void)
         pin_low(ICSP_PIN_CLK);      // ClK Low
 
         // Record data state.
-        word |= ((ICSP_PIN & ICSP_PIN_DAT) << i);
+        if (ICSP_PIN & ICSP_PIN_DAT)
+        {
+            word |= (1U << i);
+        }
 
         _delay_us(ICSP_DELAY_CKL);  // Wait a clock low period
     }
@@ -170,7 +173,7 @@ icsp_read (void)
     ICSP_DDR |= ICSP_PIN_DAT;
 
     // return result
-    return (word >> 2);
+    return word;
 }
 
 

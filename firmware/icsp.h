@@ -9,9 +9,9 @@
 #define _icsp_h_
 
 // ICSP Pin Configuration
-#define ICSP_PIN_MCLR   (1 << 0)
-#define ICSP_PIN_CLK    (1 << 1)
-#define ICSP_PIN_DAT    (1 << 2)
+#define ICSP_PIN_MCLR   (1 << 1)
+#define ICSP_PIN_CLK    (1 << 2)
+#define ICSP_PIN_DAT    (1 << 3)
 #define ICSP_PORT       PORTA
 #define ICSP_DDR        DDRA
 #define ICSP_PIN        PINA

@@ -20,8 +20,19 @@ main (void)
     uuart_init();
     icsp_init();
 
+    GIMSK |=  (1<<PCIE);		   // Enable pin change interrupt
+    PCMSK |=  (1<<PCINT6);		   // Enable pin change interrupt for PA6
+    sei();
+
+    DDRB |= (1 << 2);   // LED pin output
+
     for (;;)
     {
-        handle_command();
+        if (uuart_rx_data_available())
+        {
+            PORTB |= (1 << 2);
+            handle_command();
+            PORTB &= ~(1 << 2);
+        }
     }
 }
