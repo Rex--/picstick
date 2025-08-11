@@ -12,6 +12,7 @@
 #include "uuart.h"
 #include "icsp.h"
 #include "commands.h"
+#include "led.h"
 
 
 int
@@ -24,15 +25,15 @@ main (void)
     PCMSK |=  (1<<PCINT6);		   // Enable pin change interrupt for PA6
     sei();
 
-    DDRB |= (1 << 2);   // LED pin output
+    led_init();
 
     for (;;)
     {
         if (uuart_rx_data_available())
         {
-            PORTB |= (1 << 2);
+            led_on();
             handle_command();
-            PORTB &= ~(1 << 2);
+            led_off();
         }
     }
 }

@@ -18,7 +18,7 @@ MCU = attiny44
 F_CPU = 8000000
 
 ## Fuse settings.
-LFUSE = 0xE2
+LFUSE = 0xFD
 HFUSE = 0xDF
 EFUSE = 0xFF
 
@@ -27,7 +27,7 @@ EFUSE = 0xFF
 #    Programmer options    #
 
 ## Type of programmer using.
-PROGRAMMER_TYPE = avrisp
+PROGRAMMER_TYPE = arduino_as_isp
 
 ## Serial port of programmer.
 PROGRAMMER_PORT = /dev/ttyACM0

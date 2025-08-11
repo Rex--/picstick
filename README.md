@@ -65,8 +65,9 @@ any additional external components.
 
 **8MHz @ 76800 bauds - External Crystal**\
 _L: FD &nbsp;&nbsp; H: DF &nbsp;&nbsp; E: FF_\
+This is the default hardware configuration of a picstick.
 
 **16MHz @ 115200 bauds - External Crystal**\
 _L: FF &nbsp;&nbsp; H: DF &nbsp;&nbsp; E: FF_\
-This configuration isnt officially supported by the ATtiny44V, but it seems to
+This configuration isn't officially supported by the ATtiny44V, but it seems to
 work just fine.

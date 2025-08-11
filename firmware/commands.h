@@ -1,24 +1,26 @@
-#define SERIAL_CMD_SEP ':'
-#define SERIAL_CMD_OK "OK"
-#define SERIAL_CMD_ERROR "ERROR"
-#define SERIAL_CMD_HELLO "HELLO"
-#define SERIAL_CMD_BYE "BYE"
-#define SERIAL_CMD_START "START"
-#define SERIAL_CMD_STOP "STOP"
-#define SERIAL_CMD_ADDR "ADDR"
-#define SERIAL_CMD_ROW "ROW"
-#define SERIAL_CMD_WORD "WORD"
-#define SERIAL_CMD_READ "READ"
-#define SERIAL_CMD_ERASE "ERASE"
-#define SERIAL_CMD_ERASE_ALL 0xFFFF
-#define SERIAL_CMD_ERASE_FLASH 0xFFFE
+/** @file commands.h
+ *
+ * Handle serial commands from the host and convert them into ICSP commands.
+ * 
+*/
 
-#define INPUT_BUFFER_SIZE 135
+#ifndef _commands_h_
+#define _commands_h_
 
-#define PICCHICK_GREETING "HELLO"
+// #define CMD_SEP     ':'
+// #define CMD_END     ';'
+#define CMD_PING    'I' // Ping command
+#define CMD_START   'S' // Start programming mode
+#define CMD_QUIT    'Q' // Quit programming mode
+#define CMD_COMMAND 'C' // Send command
+#define CMD_PAYLOAD 'P' // Send command with payload
+#define CMD_READ    'R' // Send command and read response
 
-#define SERIAL_CMD_FLASH "FLASH"
+#define RESP_PONG   'O'
+#define RESP_OK     'K' // Command executed successfully
+// #define RESP_ERR    'E' // Command encountered an error
+#define RESP_UNK    '?' // Command unknown
 
-int handle_connection(void);
+void handle_command(void);
 
-uint8_t handle_command(void);
+#endif
