@@ -46,8 +46,11 @@
 /** Initialize the ICSP pins. */
 void        icsp_init (void);
 
-/** Enter the connected chip into ICSP programming mode. */
-void        icsp_enable (void);
+/** Enter the connected chip into ICSP programming mode by shifiting in the sequence MSB first. */
+void        icsp_enable_msb (void);
+
+/** Enter the connected chip into ICSP programming mode by shifiting in the sequence LSB first. */
+void        icsp_enable_lsb (void);
 
 /** Exit the connected chip from ICSP programming mode. */
 void        icsp_disable (void);
@@ -60,5 +63,16 @@ void        icsp_payload (unsigned long payload);
 
 /** Read an incoming data payload from the connected chip. */
 unsigned long icsp_read (void);
+
+
+/** Send 6-bit ICSP command to the connected chip. */
+void        icsp_short_command (unsigned char command);
+
+/** Send 6-bit ICSP command with 16-bit payload to the connected chip. */
+void        icsp_short_payload (unsigned int payload);
+
+/** Send 6-bit ICSP command then read an incoming 16-bit data payload from the connected chip. */
+unsigned int icsp_short_read (void);
+
 
 #endif

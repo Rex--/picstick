@@ -28,7 +28,7 @@ icsp_init (void)
 
 
 void
-icsp_enable (void)
+icsp_enable_msb (void)
 {
     // To enter program mode, we set MCLR low and shift in the 32 bit startup key
     
@@ -66,6 +66,53 @@ icsp_enable (void)
             _delay_us(ICSP_DELAY_CKL); // Wait a Clock low period.
         }
     }
+}
+
+void
+icsp_enable_lsb (void)
+{
+    // To enter program mode, we set MCLR low and shift in the 32 bit startup key
+    
+    icsp_pins_outputs();    // Our pins are in an input state.
+    icsp_pins_low();        // Set all pins low, including MCLR.
+
+    _delay_us(ICSP_DELAY_ENTH); // Wait Entry Hold Time period.
+
+    signed char i, j;
+    for (i=3; i >= 0; i--) { // Start with the least significant byte
+        unsigned char bit = 0x1;
+        for (j=8; j > 0; j--) { // And the least significant bit
+
+            pin_high(ICSP_PIN_CLK); // CLK High
+
+            // Determine the next data bit in the startup sequence.
+            if ((ICSP_STARTUP_KEY[i]) & bit)
+            {
+                // Transmit a 1
+                pin_high(ICSP_PIN_DAT);
+            }
+            else
+            {
+                // Transmit a 0
+                pin_low(ICSP_PIN_DAT);
+            }
+
+            _delay_us(ICSP_DELAY_CKH); // Wait a Clock High period.
+
+            // CLK low, this will cause the connected chip to latch the data.
+            pin_low(ICSP_PIN_CLK);
+
+            bit = bit << 1;
+
+            _delay_us(ICSP_DELAY_CKL); // Wait a Clock low period.
+        }
+    }
+
+    // 33rd clock at the end for some reason
+    pin_high(ICSP_PIN_CLK); // CLK High
+    _delay_us(ICSP_DELAY_CKH + 2); // Wait a Clock High period.
+    pin_low(ICSP_PIN_CLK);
+    _delay_us(ICSP_DELAY_CKL); // Wait a Clock low period.
 }
 
 void
@@ -176,6 +223,112 @@ unsigned long payload = 0;
 
     // Set start/stop bits to 0 (They should be, but not guaranteed)
     payload &= 0x7FFFFE;
+
+    // Set DAT pin back to output
+    ICSP_DDR |= ICSP_PIN_DAT;
+
+    return payload;
+}
+
+
+void
+icsp_short_command (unsigned char data)
+{
+    unsigned char bit = 0x1;
+    for (char i=0; i < 6; i++) { // Start with the LSb
+
+        pin_high(ICSP_PIN_CLK); // CLK High
+
+        // Determine the next data bit in the command.
+        if (data & bit)
+        {
+            // Transmit a 1
+            pin_high(ICSP_PIN_DAT);
+        }
+        else
+        {
+            // Transmit a 0
+            pin_low(ICSP_PIN_DAT);
+        }
+        
+        _delay_us(ICSP_DELAY_CKH);
+
+        pin_low(ICSP_PIN_CLK); // CLK Low
+
+        bit = bit << 1;
+
+        _delay_us(ICSP_DELAY_CKL);
+    }
+}
+
+void
+icsp_short_payload (unsigned int data)
+{
+    // A data payload is 16 bits long:
+    // (1)  - Start bit (0)
+    // (14) - Data bits
+    // (1)  - Stop bit (0)
+    // We can craft this payload by shifting the data left by one.
+    data = (data << 1) & 0x7FFE;
+
+    unsigned int bit = 0x1;
+    for (char i = 0; i < 16; i++) { // Start with the LSb
+
+        pin_high(ICSP_PIN_CLK); // CLK High
+
+        // Determine the next data bit in the command.
+        if (data & bit)
+        {
+            // Transmit a 1
+            pin_high(ICSP_PIN_DAT);
+        }
+        else
+        {
+            // Transmit a 0
+            pin_low(ICSP_PIN_DAT);
+        }
+        
+        _delay_us(ICSP_DELAY_CKH);
+
+        pin_low(ICSP_PIN_CLK); // CLK Low
+
+        bit = bit << 1;
+
+        _delay_us(ICSP_DELAY_CKL);
+    }
+}
+
+
+unsigned int
+icsp_short_read (void)
+{
+unsigned int payload = 0;
+
+    // Configure our DAT pin as input
+    ICSP_DDR &= ~(ICSP_PIN_DAT);
+
+    // Clock out 16 cycles and read the data bits on a CLK fall
+    for (char i = 16; i > 0; i--)
+    {
+        pin_high(ICSP_PIN_CLK);     // CLK High
+
+        payload = payload << 1;
+
+        _delay_us(ICSP_DELAY_CKH);  // Wait for chip to latch the next bit
+
+        pin_low(ICSP_PIN_CLK);      // ClK Low
+
+        // Record data state.
+        if (ICSP_PIN & ICSP_PIN_DAT)
+        {
+            payload |= 1;
+        }
+
+        _delay_us(ICSP_DELAY_CKL);  // Wait a clock low period
+    }
+
+    // Set start/stop bits to 0 (They should be, but not guaranteed)
+    payload &= 0x7FFE;
 
     // Set DAT pin back to output
     ICSP_DDR |= ICSP_PIN_DAT;
